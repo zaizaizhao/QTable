@@ -1,5 +1,49 @@
 import { fabric } from 'fabric';
 
+function createCanvas(container) {
+    return new fabric.Canvas(container);
+}
+function createGroup(objects, options, isAlreadyGrouped) {
+    return new fabric.Group(objects, options, isAlreadyGrouped);
+}
+function createRect(options) {
+    return new fabric.Rect(options);
+}
+function createLine(points, objObjects) {
+    return new fabric.Line(points, objObjects);
+}
+function createTextbox(text, options) {
+    return new fabric.Textbox(text, options);
+}
+
+function mergeCell(cell, cellWidth, cellHeight) {
+    const { startRow, startCol, endRow, endCol } = cell;
+    const left = startCol * cellWidth;
+    const top = startRow * cellHeight;
+    const width = (endCol - startCol + 1) * cellWidth;
+    const height = (endRow - startRow + 1) * cellHeight;
+    const rect = createRect({
+        left: left,
+        top: top,
+        width: width,
+        height: height,
+        fill: "white",
+        stroke: "black",
+        strokeWidth: 1,
+    });
+    const text = createTextbox("Hello", {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+        fill: "black",
+        lockMovementX: true,
+        lockMovementY: true,
+    });
+    const group = createGroup([rect, text]);
+    return group;
+}
+
 class Table {
     canvas;
     cellWidth;
@@ -7,26 +51,44 @@ class Table {
     row;
     col;
     cellLines = [];
-    mergeCellRects = [];
-    cellTexts = [];
+    mergeGroup = [];
     constructor(row, col, container) {
-        this.canvas = new fabric.StaticCanvas(container);
+        this.canvas = createCanvas(container);
         this.cellWidth = 120;
         this.cellHeight = 40;
         this.row = row;
         this.col = col;
+        this.canvas.selection = true;
+        // 监听 'selection:created' 和 'selection:updated' 事件
+        this.canvas.on("selection:created", (e) => {
+            console.log(e);
+            //@ts-ignore
+            e.target.set({ fill: "#f00" }); // 设置选中颜色
+            this.canvas.renderAll();
+        });
+        this.canvas.on("selection:updated", (e) => {
+            console.log(e.target);
+            //@ts-ignore
+            e.target.set({ fill: "#f00" }); // 设置选中颜色
+            this.canvas.renderAll();
+        });
+        // 监听 'selection:cleared' 事件
+        this.canvas.on("selection:cleared", (e) => {
+            //@ts-ignore
+            e.target.set({ fill: "#fff" }); // 设置未选中颜色
+            this.canvas.renderAll();
+        });
     }
     initMaskTable() {
         const totalHeight = this.row * this.cellHeight;
         const totalWidth = this.col * this.cellWidth;
         for (let i = 0; i <= this.row; i++) {
-            let horizontalLine = new fabric.Line([0, i * this.cellHeight, totalWidth, i * this.cellHeight], {
+            let horizontalLine = createLine([0, i * this.cellHeight, totalWidth, i * this.cellHeight], {
                 stroke: "black",
                 strokeWidth: 1,
             });
             this.cellLines.push(horizontalLine);
         }
-        // 使用另一个for循环创建列线条
         for (let j = 0; j <= this.col; j++) {
             var verticalLine = new fabric.Line([j * this.cellWidth, 0, j * this.cellWidth, totalHeight], {
                 stroke: "black",
@@ -36,38 +98,16 @@ class Table {
         }
         return this;
     }
-    mergeCells(startRow, startCol, endRow, endCol) {
-        // 计算矩形的位置和大小
-        const left = startCol * this.cellWidth;
-        const top = startRow * this.cellHeight;
-        const width = (endCol - startCol + 1) * this.cellWidth;
-        const height = (endRow - startRow + 1) * this.cellHeight;
-        // 创建一个矩形
-        const rect = new fabric.Rect({
-            left: left,
-            top: top,
-            width: width,
-            height: height,
-            fill: "white",
-            stroke: "black",
-            strokeWidth: 1,
+    mergeCells(mergeCells) {
+        mergeCells.forEach((cell) => {
+            const group = mergeCell(cell, this.cellWidth, this.cellHeight);
+            this.mergeGroup.push(group);
         });
-        var text = new fabric.Textbox("Hello", {
-            left: rect.left,
-            top: rect.top,
-            width: rect.width,
-            height: rect.height,
-            fill: "black",
-            lockMovementX: true,
-            lockMovementY: true,
-        });
-        this.cellTexts.push(text);
-        this.mergeCellRects.push(rect);
         return this;
     }
     render() {
-        console.log(this.cellLines, this.mergeCellRects, this.cellTexts);
-        this.canvas.add.apply(this.canvas, [...this.cellLines, ...this.mergeCellRects, ...this.cellTexts]);
+        this.canvas.add.apply(this.canvas, [...this.cellLines, ...this.mergeGroup]);
+        this.canvas.renderAll();
     }
 }
 

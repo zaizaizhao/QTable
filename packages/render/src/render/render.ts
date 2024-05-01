@@ -7,23 +7,56 @@ import {
   createLine,
   createText,
   createTextbox,
-} from "../shared/draw"
+} from "../shared";
+
+import type {
+  StaticCanvas,
+  Canvas,
+  Group,
+  Rect,
+  Line,
+  Text,
+  Textbox,
+} from "../shared";
+import { mergeCell } from "../utils";
 
 export class Table {
-  private canvas: fabric.StaticCanvas;
+  private canvas: Canvas;
   private cellWidth: number;
   private cellHeight: number;
   private row: number;
   private col: number;
-  private cellLines = [];
-  private mergeCellRects = [];
-  private cellTexts = [];
+  private cellLines: Line[] = [];
+  private mergeGroup: Group[] = [];
   constructor(row: number, col: number, container: string) {
-    this.canvas = createStaticCanvas(container);
+    this.canvas = createCanvas(container);
     this.cellWidth = 120;
     this.cellHeight = 40;
     this.row = row;
     this.col = col;
+    this.canvas.selection = true;
+    // 监听 'selection:created' 和 'selection:updated' 事件
+    this.canvas.on("selection:created", (e) => {
+      console.log(e);
+      
+      //@ts-ignore
+      e.target.set({ fill: "#f00" }); // 设置选中颜色
+      this.canvas.renderAll();
+    });
+
+    this.canvas.on("selection:updated", (e) => {
+      console.log(e.target);
+      //@ts-ignore
+      e.target.set({ fill: "#f00" }); // 设置选中颜色
+      this.canvas.renderAll();
+    });
+
+    // 监听 'selection:cleared' 事件
+    this.canvas.on("selection:cleared", (e) => {
+      //@ts-ignore
+      e.target.set({ fill: "#fff" }); // 设置未选中颜色
+      this.canvas.renderAll();
+    });
   }
 
   public initMaskTable() {
@@ -40,9 +73,8 @@ export class Table {
       this.cellLines.push(horizontalLine);
     }
 
-    // 使用另一个for循环创建列线条
     for (let j = 0; j <= this.col; j++) {
-      var verticalLine = createLine(
+      var verticalLine = new fabric.Line(
         [j * this.cellWidth, 0, j * this.cellWidth, totalHeight],
         {
           stroke: "black",
@@ -54,45 +86,23 @@ export class Table {
     return this;
   }
 
-  public mergeCells(
-    startRow: number,
-    startCol: number,
-    endRow: number,
-    endCol: number
-  ) :Table{
-    // 计算矩形的位置和大小
-    const left = startCol * this.cellWidth;
-    const top = startRow * this.cellHeight;
-    const width = (endCol - startCol + 1) * this.cellWidth;
-    const height = (endRow - startRow + 1) * this.cellHeight;
-
-    // 创建一个矩形
-    const rect = createRect({
-      left: left,
-      top: top,
-      width: width,
-      height: height,
-      fill: "white",
-      stroke: "black",
-      strokeWidth: 1,
+  public mergeCells(mergeCells: MergeCell[]): Table {
+    mergeCells.forEach((cell) => {
+      const group = mergeCell(cell, this.cellWidth, this.cellHeight);
+      this.mergeGroup.push(group);
     });
-    var text = createTextbox("Hello", {
-      left: rect.left,
-      top: rect.top,
-      width: rect.width,
-      height: rect.height,
-      fill: "black",
-      lockMovementX: true,
-      lockMovementY: true,
-    });
-    this.cellTexts.push(text);
-    this.mergeCellRects.push(rect);
     return this;
   }
 
   public render() {
-    this.canvas.add.apply(this.canvas, [...this.cellLines,...this.mergeCellRects,...this.cellTexts]);
+    this.canvas.add.apply(this.canvas, [...this.cellLines, ...this.mergeGroup]);
+    this.canvas.renderAll();
   }
 }
 
-
+type MergeCell = {
+  startRow: number;
+  startCol: number;
+  endRow: number;
+  endCol: number;
+};

@@ -18,8 +18,8 @@ export function createCanvas(container): fabric.Canvas {
     return new fabric.Canvas(container);
 }
 
-export function createGroup(): fabric.Group {
-    return new fabric.Group();
+export function createGroup(objects?: fabric.Object[] | undefined, options?: fabric.IGroupOptions | undefined, isAlreadyGrouped?: boolean | undefined): fabric.Group {
+    return new fabric.Group(objects,options,isAlreadyGrouped);
 }
 
 
@@ -28,7 +28,7 @@ export function createRect(options:IRectOptions): fabric.Rect {
 }
 
 export function createLine(points?: number[], objObjects?: ILineOptions): fabric.Line {
-    return new fabric.Line(points, objObjects =  {});
+    return new fabric.Line(points, objObjects);
 }
 
 export function createText(text: string, options: fabric.ITextOptions): fabric.Text {

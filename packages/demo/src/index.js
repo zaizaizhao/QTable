@@ -1,5 +1,7 @@
 
-import { Table } from "@qaTable/render";
+import { Table } from "@qtable/render";
 
-const table = new Table(5,4,"container");
-table.initMaskTable().render();
+const table = new Table(10,6,"container");
+table.initMaskTable()
+.mergeCells([{startRow:1,startCol:1,endRow:2,endCol:2},{startRow:3,startCol:3,endRow:4,endCol:3}])
+.render();
