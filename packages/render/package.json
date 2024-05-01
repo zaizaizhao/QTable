@@ -1,0 +1,24 @@
+{
+  "name": "@QTable/render",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "module": "dist/render.esm-bundler.js",
+  "buildOptions": {
+    "name": "render",
+    "formats": [
+      "esm-bundler",
+      "cjs",
+      "global"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fabric": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/fabric": "^5.3.7"
+  }
+}

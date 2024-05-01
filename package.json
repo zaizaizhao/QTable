@@ -1,0 +1,45 @@
+{
+  "private": "true",
+  "workspaces": [
+    "packages/*"
+  ],
+  "name": "QTable",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "module": "dist/qa-table.esm-bundler.js",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "build": "node scripts/build.js",
+    "git": "git add . && git cz && git push"
+  },
+  "buildOptions": {
+    "name": "QTable",
+    "formats": [
+      "esm-bundler",
+      "cjs",
+      "global"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "execa": "4",
+    "rollup": "^4.14.0",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "typescript": "^5.4.4"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "commitizen": "^4.3.0",
+    "cz-customizable": "^7.0.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
+  }
+}
