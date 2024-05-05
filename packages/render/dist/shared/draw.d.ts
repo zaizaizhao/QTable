@@ -8,7 +8,7 @@ export type Line = fabric.Line;
 export type Text = fabric.Text;
 export type Textbox = fabric.Textbox;
 export declare function createStaticCanvas(container: any): fabric.StaticCanvas;
-export declare function createCanvas(container: any): fabric.Canvas;
+export declare function createCanvas(container: any, options?: fabric.ICanvasOptions): fabric.Canvas;
 export declare function createGroup(objects?: fabric.Object[] | undefined, options?: fabric.IGroupOptions | undefined, isAlreadyGrouped?: boolean | undefined): fabric.Group;
 export declare function createRect(options: IRectOptions): fabric.Rect;
 export declare function createLine(points?: number[], objObjects?: ILineOptions): fabric.Line;

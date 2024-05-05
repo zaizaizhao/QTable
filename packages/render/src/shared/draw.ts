@@ -14,8 +14,8 @@ export function createStaticCanvas(container): fabric.StaticCanvas {
     return new fabric.StaticCanvas(container);
 }
 
-export function createCanvas(container): fabric.Canvas {
-    return new fabric.Canvas(container);
+export function createCanvas(container,options?: fabric.ICanvasOptions): fabric.Canvas {
+    return new fabric.Canvas(container,options);
 }
 
 export function createGroup(objects?: fabric.Object[] | undefined, options?: fabric.IGroupOptions | undefined, isAlreadyGrouped?: boolean | undefined): fabric.Group {

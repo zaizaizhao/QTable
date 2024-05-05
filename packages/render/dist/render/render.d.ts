@@ -4,12 +4,20 @@ export declare class Table {
     private cellHeight;
     private row;
     private col;
-    private cellLines;
+    private cellGroups;
     private mergeGroup;
-    constructor(row: number, col: number, container: string);
+    private mergeCells;
+    private startX;
+    private startY;
+    private endX;
+    private endY;
+    constructor(row: number, col: number, container: string, mergeCells: MergeCell[]);
+    private mouseMove;
+    private resetBgc;
     initMaskTable(): this;
-    mergeCells(mergeCells: MergeCell[]): Table;
+    private merge;
     render(): void;
+    private reRender;
 }
 type MergeCell = {
     startRow: number;
